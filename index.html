@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Coin Game</title>
+<style>
+  body {
+    text-align: center;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: url('LeadtexFon.png') no-repeat center center fixed;
+    background-size: cover;
+    color: white;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .container {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    z-index: 10;
+  }
+
+  .coin {
+    width: 300px;
+    height: 300px;
+    background: url('LeadtexCoin.png') no-repeat center center;
+    background-size: contain;
+    cursor: pointer;
+    margin: 70px auto 20px auto;
+    transition: transform 0.1s, box-shadow 0.1s;
+    user-select: none;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+    border-radius: 50%;
+    display: block;
+    z-index: 20;
+    position: relative;
+  }
+
+  .coin.active {
+    transform: scale(0.95);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  }
+
+  #balance, #level, #subscribers {
+    position: relative;
+    margin: 10px 0;
+    font-size: 24px;
+    z-index: 10;
+    color: white;
+  }
+
+  .click-animation {
+    position: absolute;
+    font-size: 36px;
+    color: white;
+    animation: fadeUp 1s ease-out forwards; /* Уменьшили длительность анимации в 2 раза */
+    pointer-events: none;
+    z-index: 30; /* Подняли на самый верхний слой */
+  }
+
+  @keyframes fadeUp {
+    0% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(-100px);
+    }
+  }
+
+  .progress-bar {
+    width: 80%;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    margin: 10px auto;
+    overflow: hidden;
+    display: flex;
+    justify-content: flex-start;
+  }
+
+  .progress-bar-inner {
+    height: 100%;
+    background: linear-gradient(to right, #00DE70, #0496BC);
+    width: 0;
+    transition: width 0.3s;
+  }
+
+  .menu {
+    display: flex;
+    justify-content: space-between;
+    background-color: #2C2F36;
+    padding: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 50px;
+    z-index: 30;
+  }
+
+  .menu button {
+    background-color: #2C2F36;
+    border: none;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    flex: 1;
+    height: 100%;
+    margin: 0;
+  }
+
+  .menu button.active {
+    background-color: #1F2126;
+  }
+
+  .menu button:hover, .menu button:active {
+    background-color: #1F2126;
+  }
+</style>
+</head>
+<body>
+<div class="menu">
+  <button id="coinButton" class="active" onclick="showCoin()">Coin</button>
+  <button id="upButton" onclick="showUp()">Up</button>
+  <button id="taskButton" onclick="showTask()">Task</button>
+  <button id="topButton" onclick="showTop()">Top</button>
+</div>
+<div class="container">
+  <div id="balance">Баллы: 0</div>
+  <div id="level">Уровень: 1</div>
+  <div id="subscribers">Подписчики: 0</div>
+  <div class="progress-bar">
+    <div class="progress-bar-inner" id="progress"></div>
+  </div>
+  <div class="coin" id="coin"></div>
+</div>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script>
+  let balance = 0;
+  let level = 1;
+  let pointsToNextLevel = 1000;
+  let subscribers = 0;
+  let coinImage = 'LeadtexCoin.png';
+  let telegramId = null;
+
+  function vibrateOnClick() {
+    if ("vibrate" in navigator) {
+      window.navigator.vibrate(100); // Короткая вибрация на 100 миллисекунд
+    }
+  }
+
+  function incrementScore(event) {
+    balance++;
+    document.getElementById('balance').textContent = 'Баллы: ' + balance;
+    showClickAnimation(event.touches[0].clientX, event.touches[0].clientY);
+    checkLevelUp();
+    updateProgressBar();
+    saveGameState();
+  }
+
+  function showClickAnimation(x, y) {
+    const clickText = document.createElement('div');
+    clickText.textContent = '+1';
+    clickText.className = 'click-animation';
+    clickText.style.left = `${x - 18}px`; // Смещение для центрирования текста
+    clickText.style.top = `${y - 50}px`; // Смещение для отображения над монетой
+    document.body.appendChild(clickText);
+    setTimeout(() => {
+      clickText.remove();
+    }, 1000); // Уменьшили длительность анимации в 2 раза
+  }
+
+  function checkLevelUp() {
+    if (subscribers >= pointsToNextLevel) {
+      level++;
+      pointsToNextLevel = Math.floor(pointsToNextLevel * 1.5);
+      document.getElementById('level').textContent = 'Уровень: ' + level;
+      updateProgressBar(true);
+    }
+  }
+
+  function updateProgressBar(reset = false) {
+    const progress = reset ? 0 : Math.min((subscribers / pointsToNextLevel) * 100, 100);
+    document.getElementById('progress').style.width = progress + '%';
+  }
+
+  function showCoin() {
+    setActiveButton('coinButton');
+    document.getElementById('balance').style.display = 'block';
+    document.getElementById('level').style.display = 'block';
+    document.getElementById('progress').style.display = 'block';
+  }
+
+  function showUp() {
+    setActiveButton('upButton');
+    hideGameElements();
+    Telegram.WebApp.showPopup({
+      message: "Этот раздел в разработке!",
+      buttons: [{ text: "OK", type: "close" }]
+    });
+  }
+
+  function showTask() {
+    setActiveButton('taskButton');
+    hideGameElements();
+    Telegram.WebApp.showPopup({
+      message: "Этот раздел в разработке!",
+      buttons: [{ text: "OK", type: "close" }]
+    });
+  }
+
+  function showTop() {
+    setActiveButton('topButton');
+    hideGameElements();
+    Telegram.WebApp.showPopup({
+      message: "Этот раздел в разработке!",
+      buttons: [{ text: "OK", type: "close" }]
+    });
+  }
+
+  function setActiveButton(buttonId) {
+    document.querySelectorAll('.menu button').forEach(button => {
+      button.classList.remove('active');
+    });
+    document.getElementById(buttonId).classList.add('active');
+  }
+
+  function hideGameElements() {
+    document.getElementById('balance').style.display = 'none';
+    document.getElementById('level').style.display = 'none';
+    document.getElementById('progress').style.display = 'none';
+  }
+
+  function saveGameState() {
+    const gameState = {
+      balance: balance,
+      level: level,
+      pointsToNextLevel: pointsToNextLevel,
+      coinImage: coinImage,
+      subscribers: subscribers
+    };
+    localStorage.setItem('gameState', JSON.stringify(gameState));
+  }
+
+  function loadGameState() {
+    const gameState = JSON.parse(localStorage.getItem('gameState'));
+    if (gameState) {
+      balance = gameState.balance;
+      level = gameState.level;
+      points
