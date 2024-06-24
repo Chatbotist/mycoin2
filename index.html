@@ -146,10 +146,29 @@
 
   .section {
     display: none;
+    flex-grow: 1;
+    width: 100%;
   }
 
   .section.active {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .section-title {
+    margin-top: 60px;
+    margin-bottom: 10px;
+    font-size: 24px;
+    font-weight: bold;
+  }
+
+  .ranking-container {
+    flex-grow: 1;
+    overflow-y: auto;
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
   }
 
   .ranking-item {
@@ -157,9 +176,10 @@
     align-items: center;
     background-color: rgba(44, 47, 54, 0.8);
     border-radius: 10px;
-    margin: 10px 0;
+    margin: 5px 5px 5px 5px;
     padding: 10px;
     color: white;
+    width: calc(100% - 10px);
   }
 
   .ranking-item img {
@@ -193,7 +213,7 @@
 <div class="menu">
   <button id="coinButton" class="active" onclick="showSection('coinSection')">Coin</button>
   <button id="upButton" onclick="showSection('upSection')">Up</button>
-  <button id="taskButton" onclick="showSection('taskSection')">Task</button>
+  <button id="taskButton" onclick="showSection('taskSection')">Tasks</button>
   <button id="topButton" onclick="showSection('topSection')">Top</button>
 </div>
 <div class="container">
@@ -207,14 +227,14 @@
     <div class="coin" id="coin"></div>
   </div>
   <div id="upSection" class="section">
-    <h1>Up Section</h1>
+    <h1>Up</h1>
   </div>
   <div id="taskSection" class="section">
-    <h1>Task Section</h1>
+    <h1>Tasks</h1>
   </div>
   <div id="topSection" class="section">
-    <h1>Top Players</h1>
-    <div id="ranking"></div>
+    <div class="section-title">Top Players</div>
+    <div class="ranking-container" id="ranking"></div>
   </div>
 </div>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -376,7 +396,7 @@
       });
       window.Telegram.WebApp.MainButton.show();
       window.Telegram.WebApp.MainButton.onClick(function () {
-        const url = `https://app.leadteh.ru/w/bQ300?utm_campaign=${balance}&utm_source=${level}`;
+        const url = `https://app.leadteh.ru/w/bQ300?balance=${balance}&developers=${developers}&level=${level}`;
         window.Telegram.WebApp.openLink(url);
         window.Telegram.WebApp.close();
       });
