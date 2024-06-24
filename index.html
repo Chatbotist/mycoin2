@@ -12,7 +12,7 @@
     height: 100vh;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     background: url('LeadtexFon.png') no-repeat center center fixed;
     background-size: cover;
     color: white;
@@ -29,7 +29,7 @@
     flex-grow: 1;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
     z-index: 10;
     user-select: none;
@@ -157,7 +157,7 @@
   }
 
   .section-title {
-    margin-top: 60px;
+    margin-top: 10px;
     margin-bottom: 10px;
     font-size: 24px;
     font-weight: bold;
@@ -176,10 +176,10 @@
     align-items: center;
     background-color: rgba(44, 47, 54, 0.8);
     border-radius: 10px;
-    margin: 5px 5px 5px 5px;
+    margin: 5px 0;
     padding: 10px;
     color: white;
-    width: calc(100% - 10px);
+    width: calc(100% - 20px);
   }
 
   .ranking-item img {
@@ -247,7 +247,7 @@
 
   function vibrateOnClick() {
     if ("vibrate" in navigator) {
-      window.navigator.vibrate(100); // Короткая вибрация на 100 миллисекунд
+      window.navigator.vibrate(100);
     }
   }
 
@@ -264,8 +264,8 @@
     const clickText = document.createElement('div');
     clickText.textContent = '+1';
     clickText.className = 'click-animation';
-    clickText.style.left = `${x - 18}px`; // Смещение для центрирования текста
-    clickText.style.top = `${y - 50}px`; // Смещение для отображения над монетой
+    clickText.style.left = `${x - 18}px`;
+    clickText.style.top = `${y - 50}px`;
     document.body.appendChild(clickText);
     setTimeout(() => {
       clickText.remove();
@@ -388,7 +388,7 @@
     const initData = Telegram.WebApp.initDataUnsafe;
     if (initData && initData.user) {
       telegramId = initData.user.id;
-      fetchInitialData(telegramId); // Получение начальных данных через вебхук
+      fetchInitialData(telegramId);
       window.Telegram.WebApp.MainButton.setParams({
         text: "Сохранить результат",
         color: "#2C2F36",
@@ -404,7 +404,6 @@
       console.error("initData.user is undefined");
     }
 
-    // Добавляем обработчик события для отслеживания изменения размера окна
     Telegram.WebApp.onEvent('viewportChanged', function(event) {
       if (event.isStateStable && !Telegram.WebApp.isExpanded) {
         Telegram.WebApp.expand();
@@ -419,7 +418,7 @@
     const coin = document.getElementById('coin');
     const rect = coin.getBoundingClientRect();
     const touches = event.touches;
-    if (touches.length <= 2) { // Отключаем обработку, если больше двух пальцев
+    if (touches.length <= 2) {
       for (let i = 0; i < touches.length; i++) {
         const touch = touches[i];
         if (touch.clientX >= rect.left && touch.clientX <= rect.right && touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
@@ -434,7 +433,7 @@
     const coin = document.getElementById('coin');
     const rect = coin.getBoundingClientRect();
     const changedTouches = event.changedTouches;
-    if (changedTouches.length <= 2) { // Отключаем обработку, если больше двух пальцев
+    if (changedTouches.length <= 2) {
       for (let i = 0; i < changedTouches.length; i++) {
         const touch = changedTouches[i];
         if (touch.clientX >= rect.left && touch.clientX <= rect.right && touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
@@ -444,7 +443,6 @@
       }
       coin.classList.remove('active');
     } else {
-      // Обработка для 3 и более пальцев
       for (let i = 0; i < changedTouches.length; i++) {
         const touch = changedTouches[i];
         if (touch.clientX >= rect.left && touch.clientX <= rect.right && touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
@@ -463,15 +461,13 @@
     fetchPlayerRanking();
   });
 
-  // Запрещаем увеличение масштаба жестами
   document.addEventListener('gesturestart', function (event) {
     event.preventDefault();
   });
 
-  // Автоматическая адаптация под любой экран, с сохранением пропорций
   function resizeGame() {
     const container = document.querySelector('.container');
-    const aspectRatio = 16 / 9; // Примерное соотношение сторон
+    const aspectRatio = 16 / 9;
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
 
@@ -487,7 +483,6 @@
   window.addEventListener('resize', resizeGame);
   resizeGame();
 
-  // Функция для получения начальных данных пользователя из сервера через вебхук
   function fetchInitialData(telegramId) {
     const webhookUrl = 'https://hook.eu2.make.com/3cn7hflf2x478ihdcm38gjgw2rbu5ioa';
 
@@ -528,10 +523,8 @@
     updateProgressBar();
   }
 
-  // Сохранение состояния игры при закрытии приложения
   window.addEventListener('beforeunload', saveGameState);
 
-  // Автоматическое раскрытие окна на весь экран, если оно не на весь экран
   function ensureFullScreen() {
     if (!Telegram.WebApp.isExpanded) {
       Telegram.WebApp.expand();
