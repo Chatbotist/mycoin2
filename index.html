@@ -354,7 +354,7 @@
 
     players.sort((a, b) => b.balance - a.balance);
 
-    players.forEach((player, index) => {
+    players.slice(0, 100).forEach((player, index) => { // Ограничиваем до 100 участников
       const rankingItem = document.createElement('div');
       rankingItem.className = 'ranking-item';
 
