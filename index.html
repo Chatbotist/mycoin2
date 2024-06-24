@@ -54,7 +54,7 @@
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
   }
 
-  #balance, #level, #subscribers {
+  #balance, #level, #developers {
     position: relative;
     margin: 10px 0;
     font-size: 24px;
@@ -142,7 +142,7 @@
 <div class="container" id="gameContainer">
   <div id="balance">Баллы: 0</div>
   <div id="level">Уровень: 1</div>
-  <div id="subscribers">Подписчики: 0</div>
+  <div id="developers">Разработчики: 0</div>
   <div class="progress-bar">
     <div class="progress-bar-inner" id="progress"></div>
   </div>
@@ -153,7 +153,7 @@
   let balance = 0;
   let level = 1;
   let pointsToNextLevel = 1000;
-  let subscribers = 0;
+  let developers = 0;
   let coinImage = 'LeadtexCoin.png';
   let telegramId = null;
 
@@ -185,7 +185,7 @@
   }
 
   function checkLevelUp() {
-    if (subscribers >= pointsToNextLevel) {
+    if (developers >= pointsToNextLevel) {
       level++;
       pointsToNextLevel = Math.floor(pointsToNextLevel * 1.5);
       document.getElementById('level').textContent = 'Уровень: ' + level;
@@ -194,7 +194,7 @@
   }
 
   function updateProgressBar(reset = false) {
-    const progress = reset ? 0 : Math.min((subscribers / pointsToNextLevel) * 100, 100);
+    const progress = reset ? 0 : Math.min((developers / pointsToNextLevel) * 100, 100);
     document.getElementById('progress').style.width = progress + '%';
   }
 
@@ -247,7 +247,7 @@
       level: level,
       pointsToNextLevel: pointsToNextLevel,
       coinImage: coinImage,
-      subscribers: subscribers
+      developers: developers
     };
     localStorage.setItem('gameState', JSON.stringify(gameState));
   }
@@ -259,10 +259,10 @@
       level = gameState.level;
       pointsToNextLevel = gameState.pointsToNextLevel;
       coinImage = gameState.coinImage;
-      subscribers = gameState.subscribers;
+      developers = gameState.developers;
       document.getElementById('balance').textContent = 'Баллы: ' + balance;
       document.getElementById('level').textContent = 'Уровень: ' + level;
-      document.getElementById('subscribers').textContent = 'Подписчики: ' + subscribers;
+      document.getElementById('developers').textContent = 'Разработчики: ' + developers;
       updateProgressBar();
     }
   }
@@ -273,9 +273,9 @@
 
     Telegram.WebApp.expand();
     Telegram.WebApp.enableClosingConfirmation();
-    const initDataUnsafe = Telegram.WebApp.initDataUnsafe;
-    if (initDataUnsafe && initDataUnsafe.user) {
-      telegramId = initDataUnsafe.user.id;
+    const initData = Telegram.WebApp.initDataUnsafe;
+    if (initData && initData.user) {
+      telegramId = initData.user.id;
       fetchInitialBalance(telegramId); // Получение начального баланса через вебхук
       window.Telegram.WebApp.MainButton.setParams({
         text: "Сохранить результат",
@@ -284,12 +284,12 @@
       });
       window.Telegram.WebApp.MainButton.show();
       window.Telegram.WebApp.MainButton.onClick(function () {
-        const url = `https://app.leadteh.ru/w/bQ300?utm_campaign=${balance}`;
+        const url = `https://app.leadteh.ru/w/bQ300?balance=${balance}&developers=${developers}&lvl=${level}`;
         window.Telegram.WebApp.openLink(url);
         window.Telegram.WebApp.close();
       });
     } else {
-      console.error("initDataUnsafe.user is undefined");
+      console.error("initData.user is undefined");
     }
 
     // Добавляем обработчик события для отслеживания изменения размера окна
