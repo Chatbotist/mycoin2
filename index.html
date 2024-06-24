@@ -139,7 +139,7 @@
   <button id="taskButton" onclick="showTask()">Task</button>
   <button id="topButton" onclick="showTop()">Top</button>
 </div>
-<div class="container">
+<div class="container" id="gameContainer">
   <div id="balance">Баллы: 0</div>
   <div id="level">Уровень: 1</div>
   <div id="subscribers">Подписчики: 0</div>
@@ -200,9 +200,7 @@
 
   function showCoin() {
     setActiveButton('coinButton');
-    document.getElementById('balance').style.display = 'block';
-    document.getElementById('level').style.display = 'block';
-    document.getElementById('progress').style.display = 'block';
+    document.getElementById('gameContainer').style.display = 'flex';
   }
 
   function showUp() {
@@ -240,9 +238,7 @@
   }
 
   function hideGameElements() {
-    document.getElementById('balance').style.display = 'none';
-    document.getElementById('level').style.display = 'none';
-    document.getElementById('progress').style.display = 'none';
+    document.getElementById('gameContainer').style.display = 'none';
   }
 
   function saveGameState() {
@@ -273,7 +269,7 @@
 
   if (window.Telegram && window.Telegram.WebApp) {
     window.Telegram.WebApp.setBackgroundColor("#2E3E54");
-    window.Telegram.WebApp.setHeaderColor("#182A42");
+    window.Telegram.    WebApp.setHeaderColor("#182A42");
 
     Telegram.WebApp.expand();
     Telegram.WebApp.enableClosingConfirmation();
@@ -379,7 +375,7 @@
 
   // Автоматическое раскрытие окна на весь экран, если оно не на весь экран
   function ensureFullScreen() {
-    if (window.innerHeight != screen.height) {
+    if (!Telegram.WebApp.isExpanded) {
       Telegram.WebApp.expand();
     }
   }
