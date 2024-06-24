@@ -171,6 +171,7 @@
     width: 100%;
     padding: 10px;
     box-sizing: border-box;
+    -webkit-overflow-scrolling: touch; /* Добавляем плавную прокрутку для iOS */
   }
 
   .ranking-item {
@@ -300,7 +301,7 @@
     }
   }
 
-function setActiveButton(buttonId) {
+  function setActiveButton(buttonId) {
     document.querySelectorAll('.menu button').forEach(button => {
       button.classList.remove('active');
     });
