@@ -30,6 +30,7 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
+    align-items: center;
     z-index: 10;
     user-select: none;
   }
@@ -64,7 +65,8 @@
     color: white;
     text-align: left;
     padding-left: 10px;
-    user-select: none;
+    width: 100%;
+    max-width: 600px;
   }
 
   #balance::before {
@@ -279,6 +281,7 @@
   }
 
   if (window.Telegram && window.Telegram.WebApp) {
+  if (window.Telegram && window.Telegram.WebApp) {
     window.Telegram.WebApp.setBackgroundColor("#2E3E54");
     window.Telegram.WebApp.setHeaderColor("#182A42");
 
@@ -295,7 +298,7 @@
       });
       window.Telegram.WebApp.MainButton.show();
       window.Telegram.WebApp.MainButton.onClick(function () {
-        const url = `https://app.leadteh.ru/w/bQ300?balance=${balance}&developers=${developers}&lvl=${level}`;
+        const url = `https://app.leadteh.ru/w/bQ300?balance=${balance}&developers=${developers}&level=${level}`;
         window.Telegram.WebApp.openLink(url);
         window.Telegram.WebApp.close();
       });
@@ -342,6 +345,15 @@
         }
       }
       coin.classList.remove('active');
+    } else {
+      // Обработка для 3 и более пальцев
+      for (let i = 0; i < changedTouches.length; i++) {
+        const touch = changedTouches[i];
+        if (touch.clientX >= rect.left && touch.clientX <= rect.right && touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
+          incrementScore(touch.clientX, touch.clientY);
+          vibrateOnClick();
+        }
+      }
     }
   }
 
