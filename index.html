@@ -163,10 +163,10 @@
     }
   }
 
-  function incrementScore(event) {
+  function incrementScore(x, y) {
     balance++;
     document.getElementById('balance').textContent = 'Баллы: ' + balance;
-    showClickAnimation(event.touches[0].clientX, event.touches[0].clientY);
+    showClickAnimation(x, y);
     checkLevelUp();
     updateProgressBar();
     saveGameState();
@@ -269,10 +269,10 @@
 
   if (window.Telegram && window.Telegram.WebApp) {
     window.Telegram.WebApp.setBackgroundColor("#2E3E54");
-    window.Telegram.    WebApp.setHeaderColor("#182A42");
+    window.Telegram.WebApp.setHeaderColor("#182A42");
 
     Telegram.WebApp.expand();
-    Telegram.WebApp.enableClosingConfirmation();
+        Telegram.WebApp.enableClosingConfirmation();
     const initDataUnsafe = Telegram.WebApp.initDataUnsafe;
     if (initDataUnsafe && initDataUnsafe.user) {
       telegramId = initDataUnsafe.user.id;
@@ -291,6 +291,13 @@
     } else {
       console.error("initDataUnsafe.user is undefined");
     }
+
+    // Добавляем обработчик события для отслеживания изменения размера окна
+    Telegram.WebApp.onEvent('viewportChanged', function(event) {
+      if (event.isStateStable && !Telegram.WebApp.isExpanded) {
+        Telegram.WebApp.expand();
+      }
+    });
   } else {
     console.error("Telegram Web App not detected");
   }
@@ -303,7 +310,7 @@
     for (let i = 0; i < touches.length; i++) {
       const touch = touches[i];
       if (touch.clientX >= rect.left && touch.clientX <= rect.right && touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
-        incrementScore(event);
+        incrementScore(touch.clientX, touch.clientY);
         vibrateOnClick();
         coin.classList.add('active');
         setTimeout(() => coin.classList.remove('active'), 50);
