@@ -253,6 +253,22 @@
     }
   }
 
+  // Добавляем обработчики событий для касаний
+let startY = 0;
+let endY = 0;
+
+document.getElementById('ranking').addEventListener('touchstart', function(e) {
+  startY = e.touches[0].clientY;
+});
+
+document.getElementById('ranking').addEventListener('touchmove', function(e) {
+  endY = e.touches[0].clientY;
+  let diffY = startY - endY;
+
+  // Прокручиваем список в зависимости от направления движения
+  document.getElementById('ranking').scrollTop += diffY;
+});
+  
   function incrementScore(x, y) {
     balance++;
     document.getElementById('balance').textContent = balance;
