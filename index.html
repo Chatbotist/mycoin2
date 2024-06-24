@@ -165,14 +165,14 @@
     font-weight: bold;
   }
 
-.ranking-container {
-  flex-grow: 1;
-  overflow-y: scroll; /* Используем прокрутку по вертикали всегда */
-  width: 100%;
-  padding: 10px;
-  box-sizing: border-box;
-  -webkit-overflow-scrolling: touch; /* Добавляем поддержку прокрутки на устройствах с сенсорным экраном */
-}
+  .ranking-container {
+    flex-grow: 1;
+    overflow-y: auto; /* Используем автоматическую прокрутку по вертикали */
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+    -webkit-overflow-scrolling: touch; /* Добавляем поддержку прокрутки на устройствах с сенсорным экраном */
+  }
   .ranking-item {
     display: flex;
     align-items: center;
