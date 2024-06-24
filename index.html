@@ -143,23 +143,79 @@
   .menu button:hover, .menu button:active {
     background-color: #1F2126;
   }
+
+  .section {
+    display: none;
+  }
+
+  .section.active {
+    display: block;
+  }
+
+  .ranking-item {
+    display: flex;
+    align-items: center;
+    background-color: #2C2F36;
+    border-radius: 10px;
+    margin: 10px 0;
+    padding: 10px;
+    color: white;
+  }
+
+  .ranking-item img {
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    margin-right: 10px;
+  }
+
+  .ranking-item .info {
+    flex-grow: 1;
+    text-align: left;
+  }
+
+  .ranking-item .info .name {
+    font-size: 18px;
+  }
+
+  .ranking-item .info .followers {
+    font-size: 16px;
+    color: #FFD700;
+  }
+
+  .ranking-item .rank {
+    font-size: 24px;
+    margin-left: 10px;
+  }
 </style>
 </head>
 <body>
 <div class="menu">
-  <button id="coinButton" class="active" onclick="showCoin()">Coin</button>
-  <button id="upButton" onclick="showUp()">Up</button>
-  <button id="taskButton" onclick="showTask()">Task</button>
-  <button id="topButton" onclick="showTop()">Top</button>
+  <button id="coinButton" class="active" onclick="showSection('coinSection')">Coin</button>
+  <button id="upButton" onclick="showSection('upSection')">Up</button>
+  <button id="taskButton" onclick="showSection('taskSection')">Task</button>
+  <button id="topButton" onclick="showSection('topSection')">Top</button>
 </div>
-<div class="container" id="gameContainer">
-  <div id="balance">0</div>
-  <div id="level">Уровень: 1</div>
-  <div id="developers">Разработчики: 0</div>
-  <div class="progress-bar">
-    <div class="progress-bar-inner" id="progress"></div>
+<div class="container">
+  <div id="coinSection" class="section active">
+    <div id="balance">0</div>
+    <div id="level">Уровень: 1</div>
+    <div id="developers">Разработчики: 0</div>
+    <div class="progress-bar">
+      <div class="progress-bar-inner" id="progress"></div>
+    </div>
+    <div class="coin" id="coin"></div>
   </div>
-  <div class="coin" id="coin"></div>
+  <div id="upSection" class="section">
+    <h1>Up Section</h1>
+  </div>
+  <div id="taskSection" class="section">
+    <h1>Task Section</h1>
+  </div>
+  <div id="topSection" class="section">
+    <h1>Top Players</h1>
+    <div id="ranking"></div>
+  </div>
 </div>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script>
@@ -211,36 +267,13 @@
     document.getElementById('progress').style.width = progress + '%';
   }
 
-  function showCoin() {
-    setActiveButton('coinButton');
-    document.getElementById('gameContainer').style.display = 'flex';
-  }
-
-  function showUp() {
-    setActiveButton('upButton');
-    hideGameElements();
-    Telegram.WebApp.showPopup({
-      message: "Этот раздел в разработке!",
-      buttons: [{ text: "OK", type: "close" }]
+  function showSection(sectionId) {
+    const sections = document.querySelectorAll('.section');
+    sections.forEach(section => {
+      section.classList.remove('active');
     });
-  }
-
-  function showTask() {
-    setActiveButton('taskButton');
-    hideGameElements();
-    Telegram.WebApp.showPopup({
-      message: "Этот раздел в разработке!",
-      buttons: [{ text: "OK", type: "close" }]
-    });
-  }
-
-  function showTop() {
-    setActiveButton('topButton');
-    hideGameElements();
-    Telegram.WebApp.showPopup({
-      message: "Этот раздел в разработке!",
-      buttons: [{ text: "OK", type: "close" }]
-    });
+    document.getElementById(sectionId).classList.add('active');
+    setActiveButton(sectionId + 'Button');
   }
 
   function setActiveButton(buttonId) {
@@ -248,10 +281,6 @@
       button.classList.remove('active');
     });
     document.getElementById(buttonId).classList.add('active');
-  }
-
-  function hideGameElements() {
-    document.getElementById('gameContainer').style.display = 'none';
   }
 
   function saveGameState() {
@@ -278,6 +307,60 @@
       document.getElementById('developers').textContent = 'Разработчики: ' + developers;
       updateProgressBar();
     }
+  }
+
+  function fetchPlayerRanking() {
+    const rankingUrl = 'https://example.com/api/ranking'; // Замените на ваш URL API для получения рейтинга игроков
+
+    fetch(rankingUrl)
+      .then(response => response.json())
+      .then(data => {
+        if (data && data.players) {
+          displayRanking(data.players);
+        }
+      })
+      .catch(error => {
+        console.error('Ошибка при получении рейтинга:', error);
+      });
+  }
+
+  function displayRanking(players) {
+    const rankingContainer = document.getElementById('ranking');
+    rankingContainer.innerHTML = '';
+
+    players.sort((a, b) => b.followers - a.followers);
+
+    players.forEach((player, index) => {
+      const rankingItem = document.createElement('div');
+      rankingItem.className = 'ranking-item';
+
+      const playerImage = document.createElement('img');
+      playerImage.src = player.image;
+      playerImage.alt = player.name;
+
+      const playerInfo = document.createElement('div');
+      playerInfo.className = 'info';
+
+      const playerName = document.createElement('div');
+      playerName.className = 'name';
+      playerName.textContent = player.name;
+
+      const playerFollowers = document.createElement('div');
+      playerFollowers.className = 'followers';
+      playerFollowers.textContent = player.followers.toLocaleString();
+
+      const playerRank = document.createElement('div');
+      playerRank.className = 'rank';
+      playerRank.textContent = index + 1;
+
+      playerInfo.appendChild(playerName);
+      playerInfo.appendChild(playerFollowers);
+      rankingItem.appendChild(playerImage);
+      rankingItem.appendChild(playerInfo);
+      rankingItem.appendChild(playerRank);
+
+      rankingContainer.appendChild(rankingItem);
+    });
   }
 
   if (window.Telegram && window.Telegram.WebApp) {
@@ -359,7 +442,10 @@
   document.getElementById('coin').addEventListener('touchstart', handleTouchStart);
   document.getElementById('coin').addEventListener('touchend', handleTouchEnd);
 
-  window.addEventListener('load', loadGameState);
+  window.addEventListener('load', () => {
+    loadGameState();
+    fetchPlayerRanking();
+  });
 
   // Запрещаем увеличение масштаба жестами
   document.addEventListener('gesturestart', function (event) {
