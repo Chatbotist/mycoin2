@@ -542,10 +542,14 @@
   window.addEventListener('resize', ensureFullScreen);
   ensureFullScreen();
 
-  // Добавляем обработчик для предотвращения закрытия окна при прокрутке
-  document.querySelector('.ranking-container').addEventListener('touchmove', function(event) {
-    event.stopPropagation();
-  });
+  // Отключаем возможность закрытия окна с помощью свайпа
+  const app = window.Telegram.WebApp;
+  app.ready();
+  app.isClosingConfirmationEnabled = true;
+
+  document.addEventListener('touchmove', function (event) {
+    event.preventDefault();
+  }, { passive: false });
 </script>
 </body>
 </html>
