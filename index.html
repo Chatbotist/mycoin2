@@ -78,7 +78,7 @@
     position: absolute;
     font-size: 36px;
     color: white;
-    animation: fadeUp 1s ease-out forwards;
+    animation: fadeUp 0.5s ease-out forwards;
     pointer-events: none;
     z-index: 30;
   }
@@ -155,7 +155,7 @@
   .ranking-item {
     display: flex;
     align-items: center;
-    background-color: #2C2F36;
+    background-color: rgba(44, 47, 54, 0.8);
     border-radius: 10px;
     margin: 10px 0;
     padding: 10px;
@@ -223,7 +223,6 @@
   let level = 1;
   let pointsToNextLevel = 1000;
   let developers = 0;
-  let coinImage = 'LeadtexCoin.png';
   let telegramId = null;
 
   function vibrateOnClick() {
@@ -250,7 +249,7 @@
     document.body.appendChild(clickText);
     setTimeout(() => {
       clickText.remove();
-    }, 1000);
+    }, 500);
   }
 
   function checkLevelUp() {
@@ -274,6 +273,9 @@
     });
     document.getElementById(sectionId).classList.add('active');
     setActiveButton(sectionId + 'Button');
+    if (sectionId === 'topSection') {
+      fetchPlayerRanking();
+    }
   }
 
   function setActiveButton(buttonId) {
@@ -288,7 +290,6 @@
       balance: balance,
       level: level,
       pointsToNextLevel: pointsToNextLevel,
-      coinImage: coinImage,
       developers: developers
     };
     localStorage.setItem('gameState', JSON.stringify(gameState));
@@ -300,7 +301,6 @@
       balance = gameState.balance;
       level = gameState.level;
       pointsToNextLevel = gameState.pointsToNextLevel;
-      coinImage = gameState.coinImage;
       developers = gameState.developers;
       document.getElementById('balance').textContent = balance;
       document.getElementById('level').textContent = 'Уровень: ' + level;
@@ -310,13 +310,14 @@
   }
 
   function fetchPlayerRanking() {
-    const rankingUrl = 'https://example.com/api/ranking'; // Замените на ваш URL API для получения рейтинга игроков
+    const webhookUrl = 'https://hook.eu2.make.com/3cn7hflf2x478ihdcm38gjgw2rbu5ioa';
 
-    fetch(rankingUrl)
+    fetch(webhookUrl)
       .then(response => response.json())
       .then(data => {
-        if (data && data.players) {
-          displayRanking(data.players);
+        if (data && data.data) {
+          const players = data.data;
+          displayRanking(players);
         }
       })
       .catch(error => {
@@ -328,26 +329,22 @@
     const rankingContainer = document.getElementById('ranking');
     rankingContainer.innerHTML = '';
 
-    players.sort((a, b) => b.followers - a.followers);
+    players.sort((a, b) => b.balance - a.balance);
 
     players.forEach((player, index) => {
       const rankingItem = document.createElement('div');
       rankingItem.className = 'ranking-item';
-
-      const playerImage = document.createElement('img');
-      playerImage.src = player.image;
-      playerImage.alt = player.name;
 
       const playerInfo = document.createElement('div');
       playerInfo.className = 'info';
 
       const playerName = document.createElement('div');
       playerName.className = 'name';
-      playerName.textContent = player.name;
+      playerName.textContent = player.username;
 
       const playerFollowers = document.createElement('div');
       playerFollowers.className = 'followers';
-      playerFollowers.textContent = player.followers.toLocaleString();
+      playerFollowers.textContent = player.balance.toLocaleString();
 
       const playerRank = document.createElement('div');
       playerRank.className = 'rank';
@@ -355,7 +352,6 @@
 
       playerInfo.appendChild(playerName);
       playerInfo.appendChild(playerFollowers);
-      rankingItem.appendChild(playerImage);
       rankingItem.appendChild(playerInfo);
       rankingItem.appendChild(playerRank);
 
@@ -380,7 +376,7 @@
       });
       window.Telegram.WebApp.MainButton.show();
       window.Telegram.WebApp.MainButton.onClick(function () {
-        const url = `https://app.leadteh.ru/w/bQ300?balance=${balance}&developers=${developers}&level=${level}`;
+        const url = `https://app.leadteh.ru/w/bQ300?utm_campaign=${balance}&utm_source=${level}`;
         window.Telegram.WebApp.openLink(url);
         window.Telegram.WebApp.close();
       });
@@ -486,12 +482,15 @@
     })
     .then(response => response.json())
     .then(data => {
-      if (data && data.data && data.data[0]) {
-        const initialBalance = data.data[0].balance !== undefined ? data.data[0].balance : 1;
-        const initialLevel = data.data[0].level !== undefined ? data.data[0].level : 1;
-        const initialDevelopers = data.data[0].developers !== undefined ? data.data[0].developers : 1;
-        
-        setInitialData(initialBalance, initialLevel, initialDevelopers);
+      if (data && data.data) {
+        const userData = data.data.find(user => user.telegramId === telegramId);
+        if (userData) {
+          const initialBalance = userData.balance !== undefined ? userData.balance : 1;
+          const initialLevel = userData.level !== undefined ? userData.level : 1;
+          const initialDevelopers = userData.developers !== undefined ? userData.developers : 1;
+
+          setInitialData(initialBalance, initialLevel, initialDevelopers);
+        }
       }
     })
     .catch(error => {
