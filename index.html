@@ -167,8 +167,9 @@
 
   .ranking-container {
     flex-grow: 1;
-    overflow-y: auto; /* Используем прокрутку по вертикали всегда */
+    overflow-y: auto; /* Используем прокрутку по вертикали */
     width: 100%;
+    max-height: calc(100vh - 100px); /* Устанавливаем максимальную высоту для контейнера */
     padding: 10px;
     box-sizing: border-box;
     -webkit-overflow-scrolling: touch; /* Добавляем плавную прокрутку для iOS */
