@@ -384,33 +384,37 @@
   }
 
   if (window.Telegram && window.Telegram.WebApp) {
-    window.Telegram.WebApp.setBackgroundColor("#2E3E54");
-    window.Telegram.WebApp.setHeaderColor("#182A42");
+    const app = window.Telegram.WebApp;
+    app.ready();
+    app.isClosingConfirmationEnabled = true;
 
-    Telegram.WebApp.expand();
-    Telegram.WebApp.enableClosingConfirmation();
-    const initData = Telegram.WebApp.initDataUnsafe;
+    app.setBackgroundColor("#2E3E54");
+    app.setHeaderColor("#182A42");
+    app.expand();
+    app.enableClosingConfirmation();
+
+    const initData = app.initDataUnsafe;
     if (initData && initData.user) {
       telegramId = initData.user.id;
       fetchInitialData(telegramId);
-      window.Telegram.WebApp.MainButton.setParams({
+      app.MainButton.setParams({
         text: "Сохранить результат",
         color: "#2C2F36",
         text_color: "#FFFFFF"
       });
-      window.Telegram.WebApp.MainButton.show();
-      window.Telegram.WebApp.MainButton.onClick(function () {
+      app.MainButton.show();
+      app.MainButton.onClick(function () {
         const url = `https://app.leadteh.ru/w/bQ300?balance=${balance}&developers=${developers}&level=${level}`;
-        window.Telegram.WebApp.openLink(url);
-        window.Telegram.WebApp.close();
+        app.openLink(url);
+        app.close();
       });
     } else {
       console.error("initData.user is undefined");
     }
 
-    Telegram.WebApp.onEvent('viewportChanged', function(event) {
-      if (event.isStateStable && !Telegram.WebApp.isExpanded) {
-        Telegram.WebApp.expand();
+    app.onEvent('viewportChanged', function(event) {
+      if (event.isStateStable && !app.isExpanded) {
+        app.expand();
       }
     });
   } else {
@@ -537,6 +541,11 @@
 
   window.addEventListener('resize', ensureFullScreen);
   ensureFullScreen();
+
+  // Добавляем обработчик для предотвращения закрытия окна при прокрутке
+  document.querySelector('.ranking-container').addEventListener('touchmove', function(event) {
+    event.stopPropagation();
+  });
 </script>
 </body>
 </html>
