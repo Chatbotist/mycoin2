@@ -9,6 +9,7 @@
     text-align: center;
     font-family: Arial, sans-serif;
     margin: 0;
+    height: 100vh;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -210,58 +211,36 @@
     font-size: 24px;
     margin-left: 10px;
   }
-
-  .mobile-body {
-    overflow: hidden;
-    height: 100vh;
-  }
-
-  .mobile-wrap {
-    position: absolute;
-    left: 0;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    overflow-x: hidden;
-    overflow-y: auto;
-  }
-
-  .mobile-content {
-    height: calc(100% + 1px);
-  }
 </style>
 </head>
 <body>
-<div id="wrap" class="container">
-  <div id="content" class="mobile-content">
-    <div class="menu">
-      <button id="coinButton" class="active" onclick="showSection('coinSection')">Coin</button>
-      <button id="upButton" onclick="showSection('upSection')">Up</button>
-      <button id="taskButton" onclick="showSection('taskSection')">Tasks</button>
-      <button id="topButton" onclick="showSection('topSection')">Top</button>
+<div class="menu">
+  <button id="coinButton" class="active" onclick="showSection('coinSection')">Coin</button>
+  <button id="upButton" onclick="showSection('upSection')">Up</button>
+  <button id="taskButton" onclick="showSection('taskSection')">Tasks</button>
+  <button id="topButton" onclick="showSection('topSection')">Top</button>
+</div>
+<div class="container">
+  <div id="coinSection" class="section active">
+    <div id="balance">0</div>
+    <div id="level">Уровень: 1</div>
+    <div id="developers">Разработчики: 0</div>
+    <div class="progress-bar">
+      <div class="progress-bar-inner" id="progress"></div>
     </div>
-    <div id="coinSection" class="section active">
-      <div id="balance">0</div>
-      <div id="level">Уровень: 1</div>
-      <div id="developers">Разработчики: 0</div>
-      <div class="progress-bar">
-        <div class="progress-bar-inner" id="progress"></div>
-      </div>
-      <div class="coin" id="coin"></div>
-    </div>
-    <div id="upSection" class="section">
-      <h1>Up</h1>
-    </div>
-    <div id="taskSection" class="section">
-      <h1>Tasks</h1>
-    </div>
-    <div id="topSection" class="section">
-      <div class="section-title">Top Players</div>
-      <div class="ranking-container" id="ranking"></div>
-    </div>
+    <div class="coin" id="coin"></div>
+  </div>
+  <div id="upSection" class="section">
+    <h1>Up</h1>
+  </div>
+  <div id="taskSection" class="section">
+    <h1>Tasks</h1>
+  </div>
+  <div id="topSection" class="section">
+    <div class="section-title">Top Players</div>
+    <div class="ranking-container" id="ranking"></div>
   </div>
 </div>
-<script src="https://unpkg.com/@tma.js/sdk@2.5.0/dist/index.iife.js"></script>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script>
   let balance = 0;
@@ -300,7 +279,7 @@
   function checkLevelUp() {
     if (developers >= pointsToNextLevel) {
       level++;
-      pointsToNextLevel = Math.floor(      pointsToNextLevel * 1.5);
+      pointsToNextLevel = Math.floor(pointsToNextLevel * 1.5);
       document.getElementById('level').textContent = 'Уровень: ' + level;
       updateProgressBar(true);
     }
@@ -405,37 +384,33 @@
   }
 
   if (window.Telegram && window.Telegram.WebApp) {
-    const app = window.Telegram.WebApp;
-    app.ready();
-    app.isClosingConfirmationEnabled = true;
+    window.Telegram.WebApp.setBackgroundColor("#2E3E54");
+    window.Telegram.WebApp.setHeaderColor("#182A42");
 
-    app.setBackgroundColor("#2E3E54");
-    app.setHeaderColor("#182A42");
-    app.expand();
-    app.enableClosingConfirmation();
-
-    const initData = app.initDataUnsafe;
+    Telegram.WebApp.expand();
+    Telegram.WebApp.enableClosingConfirmation();
+    const initData = Telegram.WebApp.initDataUnsafe;
     if (initData && initData.user) {
       telegramId = initData.user.id;
       fetchInitialData(telegramId);
-      app.MainButton.setParams({
+      window.Telegram.WebApp.MainButton.setParams({
         text: "Сохранить результат",
         color: "#2C2F36",
         text_color: "#FFFFFF"
       });
-      app.MainButton.show();
-      app.MainButton.onClick(function () {
+      window.Telegram.WebApp.MainButton.show();
+      window.Telegram.WebApp.MainButton.onClick(function () {
         const url = `https://app.leadteh.ru/w/bQ300?balance=${balance}&developers=${developers}&level=${level}`;
-        app.openLink(url);
-        app.close();
+        window.Telegram.WebApp.openLink(url);
+        window.Telegram.WebApp.close();
       });
     } else {
       console.error("initData.user is undefined");
     }
 
-    app.onEvent('viewportChanged', function(event) {
-      if (event.isStateStable && !app.isExpanded) {
-        app.expand();
+    Telegram.WebApp.onEvent('viewportChanged', function(event) {
+      if (event.isStateStable && !Telegram.WebApp.isExpanded) {
+        Telegram.WebApp.expand();
       }
     });
   } else {
@@ -562,16 +537,6 @@
 
   window.addEventListener('resize', ensureFullScreen);
   ensureFullScreen();
-
-  (function() {
-    var { retrieveLaunchParams, postEvent } = window.tmajs.sdk;
-    var lp = retrieveLaunchParams();
-    if (['macos', 'tdesktop', 'weba', 'web', 'webk'].includes(lp.platform    if (['macos', 'tdesktop', 'weba', 'web', 'webk'].includes(lp.platform)) return;
-    postEvent('web_app_expand');
-    document.body.classList.add('mobile-body');
-    document.getElementById('wrap').classList.add('mobile-wrap');
-    document.getElementById('content').classList.add('mobile-content');
-  })();
 </script>
 </body>
 </html>
