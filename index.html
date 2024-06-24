@@ -165,14 +165,13 @@
     font-weight: bold;
   }
 
-  .ranking-container {
-    flex-grow: 1;
-    overflow-y: auto;
-    width: 100%;
-    padding: 10px;
-    box-sizing: border-box;
-    -webkit-overflow-scrolling: touch;
-  }
+.ranking-container {
+  flex-grow: 1;
+  overflow-y: scroll; /* Используем прокрутку по вертикали всегда */
+  width: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+}
 
   .ranking-item {
     display: flex;
