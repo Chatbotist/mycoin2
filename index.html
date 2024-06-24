@@ -95,12 +95,6 @@
     }
   }
 
-  @media only screen and (max-width: 600px) {
-  .ranking-container {
-    overflow-y: scroll; /* Добавляем прокрутку по вертикали на мобильных устройствах */
-  }
-}
-
   .progress-bar {
     width: 80%;
     height: 10px;
@@ -124,7 +118,7 @@
     justify-content: space-between;
     background-color: #2C2F36;
     padding: 0;
-    position: absolute;
+    position: fixed;
     top: 0;
     width: 100%;
     height: 50px;
@@ -156,6 +150,7 @@
     flex-grow: 1;
     width: 100%;
     padding-top: 10px; /* Отступ для заголовков */
+    overflow-y: scroll; /* Добавляем прокрутку для мобильной версии */
   }
 
   .section.active {
@@ -178,6 +173,7 @@
   padding: 10px;
   box-sizing: border-box;
 }
+  
 
   .ranking-item {
     display: flex;
@@ -245,7 +241,6 @@
     <div class="ranking-container" id="ranking"></div>
   </div>
 </div>
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script>
   let balance = 0;
   let level = 1;
