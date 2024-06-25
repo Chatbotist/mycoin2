@@ -167,7 +167,7 @@
 
   .ranking-container {
     flex-grow: 1;
-    overflow-y: auto; /* Используем прокрутку по вертикали */
+    overflow: hidden; /* Убираем стандартную прокрутку */
     width: 100%;
     max-height: calc(100vh - 100px); /* Устанавливаем максимальную высоту для контейнера */
     padding: 10px;
@@ -356,7 +356,7 @@
 
     players.sort((a, b) => b.balance - a.balance);
 
-    players.slice(0, 100).forEach((player, index) => { // Ограничиваем до 100 участников
+    players.slice(0, 100).forEach((player, index) => {
       const rankingItem = document.createElement('div');
       rankingItem.className = 'ranking-item';
 
@@ -562,78 +562,50 @@
     event.preventDefault();
   });
 
-  // Обработка событий прокрутки для плавности
-  rankingContainer.style.scrollBehavior = 'smooth';
+  // Блокируем прокрутку фона
+  document.body.addEventListener('touchmove', function(event) {
+    if (!event.target.closest('.ranking-container')) {
+      event.preventDefault();
+    }
+  }, { passive: false });
 
+  // Устанавливаем FPS для плавной прокрутки
+  function smoothScroll() {
+    const fps = 60;
+    const interval = 1000 / fps;
+
+    let lastTime = Date.now();
+
+    function step() {
+      const now = Date.now();
+      const elapsed = now - lastTime;
+
+      if (elapsed > interval) {
+        lastTime = now - (elapsed % interval);
+        // Обновляем прокрутку
+        rankingContainer.scrollTop += (scrollTop - rankingContainer.scrollTop) * 0.1;
+      }
+
+      requestAnimationFrame(step);
+    }
+
+    requestAnimationFrame(step);
+  }
+
+  smoothScroll();
+
+  // Запуск игры и загрузка начальных данных
   window.addEventListener('load', () => {
     loadGameState();
     fetchPlayerRanking();
   });
 
+  // Обработка события gesturestart для предотвращения масштабирования на мобильных устройствах
   document.addEventListener('gesturestart', function(event) {
     event.preventDefault();
   });
 
-  function resizeGame() {
-    const container = document.querySelector('.container');
-    const aspectRatio = 16 / 9;
-    const windowWidth = window.innerWidth;
-    const windowHeight = window.innerHeight;
-
-    if (windowWidth / windowHeight < aspectRatio) {
-      container.style.width = '100%';
-      container.style.height = 'auto';
-    } else {
-      container.style.width = 'auto';
-      container.style.height = '100%';
-    }
-  }
-
-  window.addEventListener('resize', resizeGame);
-  resizeGame();
-
-  function fetchInitialData(telegramId) {
-    const webhookUrl = 'https://hook.eu2.make.com/aaa7sk28al8f0zikwpb46wigm13j7vrz';
-
-    fetch(webhookUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        telegram_id: telegramId
-      })
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data && data.data) {
-        const userData = data.data.find(user => user.telegramId === telegramId);
-        if (userData) {
-          const initialBalance = userData.balance !== undefined ? userData.balance : 1;
-          const initialLevel = userData.level !== undefined ? userData.level : 1;
-          const initialDevelopers = userData.developers !== undefined ? userData.developers : 1;
-
-          setInitialData(initialBalance, initialLevel, initialDevelopers);
-        }
-      }
-    })
-    .catch(error => {
-      console.error('Ошибка:', error);
-    });
-  }
-
-  function setInitialData(initialBalance, initialLevel, initialDevelopers) {
-    balance = initialBalance;
-    level = initialLevel;
-    developers = initialDevelopers;
-    document.getElementById('balance').textContent = balance;
-    document.getElementById('level').textContent = 'Уровень: ' + level;
-    document.getElementById('developers').textContent = 'Разработчики: ' + developers;
-    updateProgressBar();
-  }
-
-  window.addEventListener('beforeunload', saveGameState);
-
+  // Обеспечение полноэкранного режима
   function ensureFullScreen() {
     if (!Telegram.WebApp.isExpanded) {
       Telegram.WebApp.expand();
