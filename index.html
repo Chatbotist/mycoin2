@@ -167,13 +167,12 @@
 
   .ranking-container {
     flex-grow: 1;
-    overflow: hidden; /* Убираем стандартную прокрутку */
+    overflow-y: auto; /* Включаем вертикальную прокрутку */
     width: 100%;
     max-height: calc(100vh - 100px); /* Устанавливаем максимальную высоту для контейнера */
     padding: 10px;
     box-sizing: border-box;
     -webkit-overflow-scrolling: touch; /* Добавляем плавную прокрутку для iOS */
-    touch-action: pan-y; /* Разрешаем только вертикальную прокрутку */
   }
 
   .ranking-item {
@@ -539,17 +538,8 @@
   window.addEventListener('resize', ensureFullScreen);
   ensureFullScreen();
 
-  // Блокируем свайпинг фона и окна
-  document.addEventListener('touchmove', function(event) {
-    if (document.querySelector('.section.active').id !== 'topSection') {
-      event.preventDefault();
-    }
-  }, { passive: false });
-
   // Обработка прокрутки списка
   const rankingContainer = document.getElementById('ranking');
-  let startY, scrollTop;
-
   rankingContainer.addEventListener('touchstart', function(event) {
     startY = event.touches[0].pageY - rankingContainer.offsetTop;
     scrollTop = rankingContainer.scrollTop;
@@ -557,63 +547,10 @@
 
   rankingContainer.addEventListener('touchmove', function(event) {
     const y = event.touches[0].pageY - rankingContainer.offsetTop;
-    const walk = (y - startY) * 2; // Увеличиваем чувствительность прокрутки
+    const walk = (y - startY);
     rankingContainer.scrollTop = scrollTop - walk;
-    event.preventDefault();
   });
 
-  // Блокируем прокрутку фона
-  document.body.addEventListener('touchmove', function(event) {
-    if (!event.target.closest('.ranking-container')) {
-      event.preventDefault();
-    }
-  }, { passive: false });
-
-  // Устанавливаем FPS для плавной прокрутки
-  function smoothScroll() {
-    const fps = 60;
-    const interval = 1000 / fps;
-
-    let lastTime = Date.now();
-
-    function step() {
-      const now = Date.now();
-      const elapsed = now - lastTime;
-
-      if (elapsed > interval) {
-        lastTime = now - (elapsed % interval);
-        // Обновляем прокрутку
-        rankingContainer.scrollTop += (scrollTop - rankingContainer.scrollTop) * 0.1;
-      }
-
-      requestAnimationFrame(step);
-    }
-
-    requestAnimationFrame(step);
-  }
-
-  smoothScroll();
-
-  // Запуск игры и загрузка начальных данных
-  window.addEventListener('load', () => {
-    loadGameState();
-    fetchPlayerRanking();
-  });
-
-  // Обработка события gesturestart для предотвращения масштабирования на мобильных устройствах
-  document.addEventListener('gesturestart', function(event) {
-    event.preventDefault();
-  });
-
-  // Обеспечение полноэкранного режима
-  function ensureFullScreen() {
-    if (!Telegram.WebApp.isExpanded) {
-      Telegram.WebApp.expand();
-    }
-  }
-
-  window.addEventListener('resize', ensureFullScreen);
-  ensureFullScreen();
 </script>
 </body>
 </html>
