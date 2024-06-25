@@ -555,11 +555,6 @@
     scrollTop = rankingContainer.scrollTop;
   });
 
-  rankingContainer.addEventListener('touchstart', function(event) {
-    startY = event.touches[0].pageY - rankingContainer.offsetTop;
-    scrollTop = rankingContainer.scrollTop;
-  });
-
   rankingContainer.addEventListener('touchmove', function(event) {
     const y = event.touches[0].pageY - rankingContainer.offsetTop;
     const walk = (y - startY) * 2; // Увеличиваем чувствительность прокрутки
@@ -567,10 +562,32 @@
     event.preventDefault();
   });
 
+  // Обработка событий прокрутки для плавности
+  rankingContainer.style.scrollBehavior = 'smooth';
+
   window.addEventListener('load', () => {
     loadGameState();
     fetchPlayerRanking();
   });
+
+  document.addEventListener('gesturestart', function(event) {
+    event.preventDefault();
+  });
+
+  function resizeGame() {
+    const container = document.querySelector('.container');
+    const aspectRatio = 16 / 9;
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+
+    if (windowWidth / windowHeight < aspectRatio) {
+      container.style.width = '100%';
+      container.style.height = 'auto';
+    } else {
+      container.style.width = 'auto';
+      container.style.height = '100%';
+    }
+  }
 
   window.addEventListener('resize', resizeGame);
   resizeGame();
