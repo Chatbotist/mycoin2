@@ -173,6 +173,7 @@
     padding: 10px;
     box-sizing: border-box;
     -webkit-overflow-scrolling: touch; /* Добавляем плавную прокрутку для iOS */
+    touch-action: pan-y; /* Разрешаем только вертикальную прокрутку */
   }
 
   .ranking-item {
@@ -241,7 +242,6 @@
     <div class="ranking-container" id="ranking"></div>
   </div>
 </div>
-<div id="blocker" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 50; pointer-events: none;"></div>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script>
   let balance = 0;
@@ -484,6 +484,93 @@
       container.style.height = '100%';
     }
   }
+
+  window.addEventListener('resize', resizeGame);
+  resizeGame();
+
+  function fetchInitialData(telegramId) {
+    const webhookUrl = 'https://hook.eu2.make.com/aaa7sk28al8f0zikwpb46wigm13j7vrz';
+
+    fetch(webhookUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        telegram_id: telegramId
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data && data.data) {
+        const userData = data.data.find(user => user.telegramId === telegramId);
+        if (userData) {
+          const initialBalance = userData.balance !== undefined ? userData.balance : 1;
+          const initialLevel = userData.level !== undefined ? userData.level : 1;
+          const initialDevelopers = userData.developers !== undefined ? userData.developers : 1;
+
+          setInitialData(initialBalance, initialLevel, initialDevelopers);
+        }
+      }
+    })
+    .catch(error => {
+      console.error('Ошибка:', error);
+    });
+  }
+
+  function setInitialData(initialBalance, initialLevel, initialDevelopers) {
+    balance = initialBalance;
+    level = initialLevel;
+    developers = initialDevelopers;
+    document.getElementById('balance').textContent = balance;
+    document.getElementById('level').textContent = 'Уровень: ' + level;
+    document.getElementById('developers').textContent = 'Разработчики: ' + developers;
+    updateProgressBar();
+  }
+
+  window.addEventListener('beforeunload', saveGameState);
+
+  function ensureFullScreen() {
+    if (!Telegram.WebApp.isExpanded) {
+      Telegram.WebApp.expand();
+    }
+  }
+
+  window.addEventListener('resize', ensureFullScreen);
+  ensureFullScreen();
+
+  // Блокируем свайпинг фона и окна
+  document.addEventListener('touchmove', function(event) {
+    if (document.querySelector('.section.active').id !== 'topSection') {
+      event.preventDefault();
+    }
+  }, { passive: false });
+
+  // Обработка прокрутки списка
+  const rankingContainer = document.getElementById('ranking');
+  let startY, scrollTop;
+
+  rankingContainer.addEventListener('touchstart', function(event) {
+    startY = event.touches[0].pageY - rankingContainer.offsetTop;
+    scrollTop = rankingContainer.scrollTop;
+  });
+
+  rankingContainer.addEventListener('touchstart', function(event) {
+    startY = event.touches[0].pageY - rankingContainer.offsetTop;
+    scrollTop = rankingContainer.scrollTop;
+  });
+
+  rankingContainer.addEventListener('touchmove', function(event) {
+    const y = event.touches[0].pageY - rankingContainer.offsetTop;
+    const walk = (y - startY) * 2; // Увеличиваем чувствительность прокрутки
+    rankingContainer.scrollTop = scrollTop - walk;
+    event.preventDefault();
+  });
+
+  window.addEventListener('load', () => {
+    loadGameState();
+    fetchPlayerRanking();
+  });
 
   window.addEventListener('resize', resizeGame);
   resizeGame();
