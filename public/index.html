@@ -190,7 +190,10 @@
         'Content-Type': 'application/json'
       }
     })
-    .then(response => response.json())
+    .then(response => {
+      alert('Ответ получен: ' + response.status);
+      return response.json();
+    })
     .then(data => {
       alert('Данные пользователя получены');
       if (data && data.data) {
@@ -235,7 +238,10 @@
           }
         })
       })
-      .then(response => response.json())
+      .then(response => {
+        alert('Ответ обновления данных: ' + response.status);
+        return response.json();
+      })
       .then(data => {
         alert('User data updated successfully');
       })
