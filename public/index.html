@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Coin Game</title>
-<link rel="stylesheet" href="public/style.css">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div class="menu">
@@ -169,17 +169,6 @@
     if (initData && initData.user) {
       telegramId = initData.user.id;
       fetchInitialData();
-      window.Telegram.WebApp.MainButton.setParams({
-        text: "Сохранить результат",
-        color: "#2C2F36",
-        text_color: "#FFFFFF"
-      });
-      window.Telegram.WebApp.MainButton.show();
-      window.Telegram.WebApp.MainButton.onClick(function () {
-        const url = `https://app.leadteh.ru/w/bQ300?balance=${balance}&developers=${developers}&level=${level}`;
-        window.Telegram.WebApp.openLink(url);
-        window.Telegram.WebApp.close();
-      });
     } else {
       console.error("initData.user is undefined");
     }
