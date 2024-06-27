@@ -261,7 +261,6 @@
     showClickAnimation(x, y);
     checkLevelUp();
     updateProgressBar();
-    saveGameState();
   }
 
   function showClickAnimation(x, y) {
@@ -295,7 +294,7 @@
     sections.forEach(section => {
       section.classList.remove('active');
     });
-    document.getElementById(sectionId    ).classList.add('active');
+    document.getElementById(sectionId).classList.add('active');
     setActiveButton(sectionId + 'Button');
     if (sectionId === 'topSection') {
       fetchPlayerRanking();
@@ -310,21 +309,15 @@
   }
 
   function fetchPlayerRanking() {
-    const apiUrl = '/api/getListItems';
-
-    fetch(apiUrl, {
+    fetch('/api/getListItems', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        api_token: 'DOlW2wu8eIkzv2eu5yONxq2SUHrSXlLvRrbsRgDjBjzENmPI2vZpDyIKC6kb',
-        schema_id: '66766a7ee60a49ba79057c62'
-      })
+      }
     })
     .then(response => response.json())
     .then(data => {
-      if (data) {
+      if (data && data.data) {
         const players = data.data;
         displayRanking(players);
       }
@@ -446,35 +439,15 @@
   document.getElementById('coin').addEventListener('touchend', handleTouchEnd);
 
   window.addEventListener('load', () => {
-    fetchInitialData(telegramId);
+    fetchInitialData();
     fetchPlayerRanking();
   });
 
-  function resizeGame() {
-    const container = document.querySelector('.container');
-    const aspectRatio = 16 / 9;
-    const windowWidth = window.innerWidth;
-    const windowHeight = window.innerHeight;
-
-    if (windowWidth / windowHeight < aspectRatio) {
-      container.style.width = '100%';
-      container.style.height = 'auto';
-    } else {
-      container.style.width = 'auto';
-      container.style.height = '100%';
-    }
-  }
-
-  window.addEventListener('resize', resizeGame);
-  resizeGame();
-
-  function fetchInitialData(telegramId) {
-    const apiUrl = '/api/getUserData';
-
-    fetch(apiUrl, {
+  function fetchInitialData() {
+    fetch('/api/getUserData', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({
         telegram_id: telegramId
@@ -484,15 +457,11 @@
     .then(data => {
       if (data && data.data) {
         const userData = data.data;
-        const initialBalance = userData.balance !== undefined ? userData.balance : 0;
-        const initialLevel = userData.level !== undefined ? userData.level : 1;
-        const initialDevelopers = userData.developers !== undefined ? userData.developers : 0;
-
-        setInitialData(initialBalance, initialLevel, initialDevelopers);
+        setInitialData(userData.balance, userData.level, userData.developers);
       }
     })
     .catch(error => {
-      console.error('Ошибка:', error);
+      console.error('Ошибка при получении данных пользователя:', error);
     });
   }
 
@@ -527,14 +496,6 @@
     const walk = (y - startY);
     rankingContainer.scrollTop = scrollTop - walk;
   });
-
-  // Магия документа/тела для предотвращения закрытия окна и улучшения прокрутки
-  const overflow = 100;
-  document.body.style.overflowY = 'hidden';
-  document.body.style.marginTop = `${overflow}px`;
-  document.body.style.height = window.innerHeight + overflow + "px";
-  document.body.style.paddingBottom = `${overflow}px`;
-  window.scrollTo(0, overflow);
 
   // Блокировка touchmove для корректной работы прокрутки
   let ts;
