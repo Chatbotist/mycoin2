@@ -334,19 +334,28 @@
   }
 
   function fetchPlayerRanking() {
-    const webhookUrl = 'https://hook.eu2.make.com/aaa7sk28al8f0zikwpb46wigm13j7vrz';
+    const apiUrl = '/api/getListItems';
 
-    fetch(webhookUrl)
-      .then(response => response.json())
-      .then(data => {
-        if (data && data.data) {
-          const players = data.data;
-          displayRanking(players);
-        }
+    fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        api_token: 'DOlW2wu8eIkzv2eu5yONxq2SUHrSXlLvRrbsRgDjBjzENmPI2vZpDyIKC6kb',
+        schema_id: '66766a7ee60a49ba79057c62'
       })
-      .catch(error => {
-        console.error('Ошибка при получении рейтинга:', error);
-      });
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data) {
+        const players = data.data;
+        displayRanking(players);
+      }
+    })
+    .catch(error => {
+      console.error('Ошибка при получении рейтинга:', error);
+    });
   }
 
   function displayRanking(players) {
