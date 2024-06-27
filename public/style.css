@@ -4,6 +4,7 @@ body {
   margin: 0;
   padding: 0;
   overflow: hidden;
+  background-color: #2E3E54; /* Установите фон */
 }
 
 .menu {
@@ -43,7 +44,7 @@ body {
 #coin {
   width: 100px;
   height: 100px;
-  background-color: gold;
+  background-color: gold; /* Установите цвет монеты */
   border-radius: 50%;
   margin-top: 20px;
   cursor: pointer;
