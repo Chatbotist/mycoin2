@@ -295,7 +295,7 @@
     sections.forEach(section => {
       section.classList.remove('active');
     });
-    document.getElementById(sectionId).classList.add('active');
+    document.getElementById(sectionId    ).classList.add('active');
     setActiveButton(sectionId + 'Button');
     if (sectionId === 'topSection') {
       fetchPlayerRanking();
@@ -307,30 +307,6 @@
       button.classList.remove('active');
     });
     document.getElementById(buttonId).classList.add('active');
-  }
-
-  function saveGameState() {
-    const gameState = {
-      balance: balance,
-      level: level,
-      pointsToNextLevel: pointsToNextLevel,
-      developers: developers
-    };
-    localStorage.setItem('gameState', JSON.stringify(gameState));
-  }
-
-  function loadGameState() {
-    const gameState = JSON.parse(localStorage.getItem('gameState'));
-    if (gameState) {
-      balance = gameState.balance;
-      level = gameState.level;
-      pointsToNextLevel = gameState.pointsToNextLevel;
-      developers = gameState.developers;
-      document.getElementById('balance').textContent = balance;
-      document.getElementById('level').textContent = 'Уровень: ' + level;
-      document.getElementById('developers').textContent = 'Разработчики: ' + developers;
-      updateProgressBar();
-    }
   }
 
   function fetchPlayerRanking() {
@@ -470,12 +446,8 @@
   document.getElementById('coin').addEventListener('touchend', handleTouchEnd);
 
   window.addEventListener('load', () => {
-    loadGameState();
+    fetchInitialData(telegramId);
     fetchPlayerRanking();
-  });
-
-  document.addEventListener('gesturestart', function (event) {
-    event.preventDefault();
   });
 
   function resizeGame() {
@@ -497,9 +469,9 @@
   resizeGame();
 
   function fetchInitialData(telegramId) {
-    const webhookUrl = 'https://hook.eu2.make.com/aaa7sk28al8f0zikwpb46wigm13j7vrz';
+    const apiUrl = '/api/getUserData';
 
-    fetch(webhookUrl, {
+    fetch(apiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -511,14 +483,12 @@
     .then(response => response.json())
     .then(data => {
       if (data && data.data) {
-        const userData = data.data.find(user => user.telegramId === telegramId);
-        if (userData) {
-          const initialBalance = userData.balance !== undefined ? userData.balance : 1;
-          const initialLevel = userData.level !== undefined ? userData.level : 1;
-          const initialDevelopers = userData.developers !== undefined ? userData.developers : 1;
+        const userData = data.data;
+        const initialBalance = userData.balance !== undefined ? userData.balance : 0;
+        const initialLevel = userData.level !== undefined ? userData.level : 1;
+        const initialDevelopers = userData.developers !== undefined ? userData.developers : 0;
 
-          setInitialData(initialBalance, initialLevel, initialDevelopers);
-        }
+        setInitialData(initialBalance, initialLevel, initialDevelopers);
       }
     })
     .catch(error => {
@@ -535,8 +505,6 @@
     document.getElementById('developers').textContent = 'Разработчики: ' + developers;
     updateProgressBar();
   }
-
-  window.addEventListener('beforeunload', saveGameState);
 
   function ensureFullScreen() {
     if (!Telegram.WebApp.isExpanded) {
