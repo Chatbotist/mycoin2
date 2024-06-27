@@ -103,7 +103,8 @@
   }
 
   function fetchPlayerRanking() {
-    fetch('/api/getListItems', {
+    const url = '/api/getUserData';
+    fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -111,18 +112,13 @@
     })
     .then(response => response.json())
     .then(data => {
-      alert('Данные игроков получены');
       if (data && data.data) {
         const players = data.data;
         displayRanking(players);
-        const user = players.find(player => player.telegram_id === telegramId);
-        if (user) {
-          setInitialData(user.balance, user.level, user.developers, user.id);
-        }
       }
     })
     .catch(error => {
-      alert('Ошибка при получении рейтинга: ' + error);
+      console.error('Ошибка при получении рейтинга:', error);
     });
   }
 
@@ -184,28 +180,25 @@
   }
 
   function fetchInitialData() {
-    fetch('/api/getListItems', {
+    const url = '/api/getUserData';
+    fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       }
     })
-    .then(response => {
-      alert('Ответ получен: ' + response.status);
-      return response.json();
-    })
+    .then(response => response.json())
     .then(data => {
-      alert('Данные пользователя получены');
       if (data && data.data) {
         const players = data.data;
-        const user = players.find(player => player.telegram_id === telegramId);
+        const user = players.find(player => player.tg_id === telegramId);
         if (user) {
           setInitialData(user.balance, user.level, user.developers, user.id);
         }
       }
     })
     .catch(error => {
-      alert('Ошибка при получении данных пользователя: ' + error);
+      console.error('Ошибка при получении данных пользователя:', error);
     });
   }
 
@@ -223,7 +216,8 @@
 
   function startAutoUpdate() {
     setInterval(() => {
-      fetch('https://app.leadteh.ru/api/v1/updateListItem', {
+      const url = '/api/updateUserData';
+      fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -238,15 +232,12 @@
           }
         })
       })
-      .then(response => {
-        alert('Ответ обновления данных: ' + response.status);
-        return response.json();
-      })
+      .then(response => response.json())
       .then(data => {
-        alert('User data updated successfully');
+        console.log('User data updated successfully');
       })
       .catch(error => {
-        alert('Ошибка при обновлении данных пользователя: ' + error);
+        console.error('Ошибка при обновлении данных пользователя:', error);
       });
     }, 10000); // 10 секунд
   }
