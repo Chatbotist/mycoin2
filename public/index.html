@@ -103,7 +103,7 @@
   }
 
   function fetchPlayerRanking() {
-    fetch('/api/getUserData', {
+    fetch('/api/getListItems', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -111,17 +111,18 @@
     })
     .then(response => response.json())
     .then(data => {
+      alert('Данные игроков получены');
       if (data && data.data) {
         const players = data.data;
         displayRanking(players);
-        const user = players.find(player => player.telegramId === telegramId);
+        const user = players.find(player => player.telegram_id === telegramId);
         if (user) {
           setInitialData(user.balance, user.level, user.developers, user.id);
         }
       }
     })
     .catch(error => {
-      console.error('Ошибка при получении рейтинга:', error);
+      alert('Ошибка при получении рейтинга: ' + error);
     });
   }
 
@@ -170,7 +171,7 @@
       telegramId = initData.user.id;
       fetchInitialData();
     } else {
-      console.error("initData.user is undefined");
+      alert("initData.user is undefined");
     }
 
     Telegram.WebApp.onEvent('viewportChanged', function(event) {
@@ -179,11 +180,11 @@
       }
     });
   } else {
-    console.error("Telegram Web App not detected");
+    alert("Telegram Web App not detected");
   }
 
   function fetchInitialData() {
-    fetch('/api/getUserData', {
+    fetch('/api/getListItems', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -191,16 +192,17 @@
     })
     .then(response => response.json())
     .then(data => {
+      alert('Данные пользователя получены');
       if (data && data.data) {
         const players = data.data;
-        const user = players.find(player => player.telegramId === telegramId);
+        const user = players.find(player => player.telegram_id === telegramId);
         if (user) {
           setInitialData(user.balance, user.level, user.developers, user.id);
         }
       }
     })
     .catch(error => {
-      console.error('Ошибка при получении данных пользователя:', error);
+      alert('Ошибка при получении данных пользователя: ' + error);
     });
   }
 
@@ -235,10 +237,10 @@
       })
       .then(response => response.json())
       .then(data => {
-        console.log('User data updated successfully:', data);
+        alert('User data updated successfully');
       })
       .catch(error => {
-        console.error('Ошибка при обновлении данных пользователя:', error);
+        alert('Ошибка при обновлении данных пользователя: ' + error);
       });
     }, 10000); // 10 секунд
   }
@@ -272,14 +274,6 @@
         }
       }
       coin.classList.remove('active');
-    } else {
-      for (let i = 0; i < changedTouches.length; i++) {
-        const touch = changedTouches[i];
-        if (touch.clientX >= rect.left && touch.clientX <= rect.right && touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
-          incrementScore(touch.clientX, touch.clientY);
-          vibrateOnClick();
-        }
-      }
     }
   }
 
