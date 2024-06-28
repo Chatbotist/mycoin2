@@ -180,7 +180,7 @@
   }
 
   function fetchInitialData() {
-    const url = '/api/getUserData';
+    const url = `/api/getUserDataByTelegramId?telegram_id=${telegramId}`;
     fetch(url, {
       method: 'POST',
       headers: {
@@ -190,11 +190,8 @@
     .then(response => response.json())
     .then(data => {
       if (data && data.data) {
-        const players = data.data;
-        const user = players.find(player => player.tg_id === telegramId);
-        if (user) {
-          setInitialData(user.balance, user.level, user.developers, user.id);
-        }
+        const user = data.data;
+        setInitialData(user.balance, user.level, user.developers, user.id);
       }
     })
     .catch(error => {
