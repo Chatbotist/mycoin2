@@ -28,7 +28,7 @@ app.post('/api/getUserData', async (req, res) => {
 });
 
 app.post('/api/getUserDataByTelegramId', async (req, res) => {
-  const { telegram_id } = req.query;
+  const telegram_id = req.query.telegram_id;
   try {
     const response = await fetch(`https://app.leadteh.ru/api/v1/getListItems?api_token=DOlW2wu8eIkzv2eu5yONxq2SUHrSXlLvRrbsRgDjBjzENmPI2vZpDyIKC6kb&schema_id=66766a7ee60a49ba79057c62&filters[tg_id]=${telegram_id}`, {
       method: 'POST',
