@@ -1,7 +1,7 @@
 {
-  "name": "your-project-name",
+  "name": "Игра кликер",
   "version": "1.0.0",
-  "description": "Описание вашего проекта",
+  "description": "Тапай по монете и прокачивай свой уровень, чтобы занять 1 место",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
@@ -10,6 +10,6 @@
     "express": "^4.17.1",
     "node-fetch": "^2.6.1"
   },
-  "author": "Ваше имя",
+  "author": "Дмитрий Chatbotist",
   "license": "ISC"
 }
